@@ -64,6 +64,7 @@
        ;;rotate-text       ; cycle region at point between text candidates
        snippets          ; my elves. They type so I don't have to
        ;;word-wrap         ; soft wrapping with language-aware indent
+       command-log-mode         ;log mode
 
        :emacs
        dired             ; making dired pretty [functional]
@@ -176,6 +177,8 @@
        ;;(wanderlust +gmail)
 
        :app
+       speed-type
+       keycast-mode
        ;;calendar
        ;;emms
        ;;everywhere        ; *leave* Emacs!? You must be joking
