@@ -8,7 +8,7 @@
 
 ;; To install SOME-PACKAGE from MELPA, ELPA or emacsmirror:
 ;(package! some-package)
-(package! command-log-mode)
+
 ;; To install a package directly from a remote git repo, you must specify a
 ;; `:recipe'. You'll find documentation on what `:recipe' accepts here:
 ;; https://github.com/raxod502/straight.el#the-recipe-format
@@ -24,9 +24,13 @@
 
 (package! speed-type)   ;speed typing at my fingertips!
 (package! keycast)      ;shows commands in modeline AKA "wtf did i just do?"
+(package! beacon)       ;beacon of light when needed, to show where the point is and active window.
+;;(package! command-log-mode)
+
+
 ;; If you'd like to disable a package included with Doom, you can do so here
 ;; with the `:disable' property:
-;(package! builtin-package :disable t)
+;;(package! clj-refactor :disable t)
 
 ;; You can override the recipe of a built in package without having to specify
 ;; all the properties for `:recipe'. These will inherit the rest of its recipe
@@ -41,7 +45,9 @@
 
 ;; Use `:pin' to specify a particular commit to install.
 ;(package! builtin-package :pin "1a2b3c4d5e")
-
+;;(package! cider :pin  "8b3dabeefa8a3352d7a30a9fd9027c05a4c4f6e24f4a521")        ;;Cider 1.1.1 YAY!
+;;(package! clojure-mode :pin "0e886656c83e6e8771f748ec698bb173adcb0968")  ;; clojure-mode 5.13.0
+;;(package! clj-refactor :pin "b24ce76acefe792975f00147c94b4dd784e65b80") ;;v 2.5.1
 
 ;; Doom's packages are pinned to a specific commit and updated from release to
 ;; release. The `unpin!' macro allows you to unpin single packages...

@@ -72,13 +72,13 @@
          command-log-mode-window-size 80))
 ;;
 ;;Set up keycast.
-;;TODO: make it ON globally by default.
 (use-package! keycast
+;;  :hook (text-mode . keycast-mode)
   :commands keycast-mode
   :config
   (define-minor-mode keycast-mode
     "Show current command and its key binding in the mode line."
-    :global t
+    :GLOBAL t
     (if keycast-mode
         (progn
           (add-hook 'pre-command-hook 'keycast--update t)
@@ -91,3 +91,10 @@
     '(keycast-key :inherit custom-modified
                   :height 1.1
                   :weight bold)))
+
+(keycast-mode t)
+(beacon-mode t)
+
+;;(after! clojure-mode
+;;  (setq cider-inject-dependencies-at-jack-in nil)
+;;  (setq cider-clojure-cli-global-options "-M:dev"))
