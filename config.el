@@ -73,7 +73,7 @@
 ;;
 ;;Set up keycast.
 (use-package! keycast
-;;  :hook (text-mode . keycast-mode)
+  :hook (text-mode . keycast-mode)
   :commands keycast-mode
   :config
   (define-minor-mode keycast-mode
