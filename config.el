@@ -25,7 +25,7 @@
 ;; They all accept either a font-spec, font string ("Input Mono-12"), or xlfd
 ;; font string. You generally only need these two:
 (setq doom-font (font-spec :family "Iosevka SS04" :size 20 :weight 'semi-light)
-      doom-variable-pitch-font (font-spec :family "Iosevka Aile" :size 13))
+      doom-variable-pitch-font (font-spec :family "Iosevka Aile" :size 15))
 
 ;; There are two ways to load a theme. Both assume the theme is installed and
 ;; available. You can either set `doom-theme' or manually load a theme with the
@@ -58,43 +58,54 @@
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
 
-;;
+;;STOP ASKING!
+(map! "C-x k" 'kill-current-buffer)
+
 ;;Set modified buffer to orange, default red is too much...
 (custom-set-faces!
   '(doom-modeline-buffer-modified :foreground "orange"))
 
-(use-package! command-log-mode
-   :commands global-command-log-mode
-   :config
-   (setq command-log-mode-auto-show t
-         command-log-mode-open-log-turns-on-mode nil
-         command-log-mode-is-global t
-         command-log-mode-window-size 80))
-;;
-;;Set up keycast.
-(use-package! keycast
-  :hook (text-mode . keycast-mode)
-  :commands keycast-mode
-  :config
-  (define-minor-mode keycast-mode
-    "Show current command and its key binding in the mode line."
-    :GLOBAL t
-    (if keycast-mode
-        (progn
-          (add-hook 'pre-command-hook 'keycast--update t)
-          (add-to-list 'global-mode-string '("" mode-line-keycast " ")))
-      (remove-hook 'pre-command-hook 'keycast--update)
-      (setq global-mode-string (remove '("" mode-line-keycast " ") global-mode-string))))
-  (custom-set-faces!
-    '(keycast-command :inherit doom-modeline-debug
-                      :height 0.9)
-    '(keycast-key :inherit custom-modified
-                  :height 1.1
-                  :weight bold)))
 
-(keycast-mode t)
+(use-package! keycast
+  :after (doom-modeline)
+  :config
+  (setq keycast-mode-line-insert-after '(:eval (doom-modeline-format--main)))
+  (add-to-list 'global-mode-string '("" keycast-mode-line))
+  :hook
+  (doom-modeline-mode . keycast-mode-line-mode))
+
 (beacon-mode t)
 
-;;(after! clojure-mode
-;;  (setq cider-inject-dependencies-at-jack-in nil)
-;;  (setq cider-clojure-cli-global-options "-M:dev"))
+;;show counter when searching
+(setq isearch-lazy-count t)
+;;treat space in isearch as non greedy any content
+;;(setq search-whitespace-regexp ".*?")
+(use-package! gptel
+  :config
+  (setq! gptel-api-key (getenv "OPEN_API_KEY")))
+
+(add-hook! (clojure-mode emacs-lisp-mode lisp-mode
+                         cider-repl-mode racket-mode racket-repl-mode)
+  (enable-paredit-mode))
+
+
+;; Reuse buffers for Dired, dont like when it creates a separate one each time.
+(after! dired
+  (setf dired-kill-when-opening-new-dired-buffer t))
+
+;; Cider PopUp goes to right, instead of bottom.
+(after! cider
+  (set-popup-rules!
+    '(("^\\*cider-repl"
+       :side right
+       :width 100
+       :quit nil
+       :ttl nil))))
+
+(after! cider
+  ;; work around logging issues, figwheel-main vs cider ... fight!
+  ;; FORTUM from magnusn
+  (defun cider-figwheel-workaround--boot-up-cljs ()
+    (format "(boot-up-cljs %s)" cider-figwheel-main-default-options))
+
+  (cider-register-cljs-repl-type 'boot-up-cljs #'cider-figwheel-workaround--boot-up-cljs))
