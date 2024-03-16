@@ -61,6 +61,7 @@
 ;;STOP ASKING!
 (map! "C-x k" 'kill-current-buffer)
 
+(map! "M-o" 'ace-window)
 ;;Set modified buffer to orange, default red is too much...
 (custom-set-faces!
   '(doom-modeline-buffer-modified :foreground "orange"))
@@ -70,6 +71,7 @@
   :after (doom-modeline)
   :config
   (setq keycast-mode-line-insert-after '(:eval (doom-modeline-format--main)))
+                                        ;(setq keycast-mode-line-insert-after "%e")
   (add-to-list 'global-mode-string '("" keycast-mode-line))
   :hook
   (doom-modeline-mode . keycast-mode-line-mode))
@@ -82,30 +84,36 @@
 ;;(setq search-whitespace-regexp ".*?")
 (use-package! gptel
   :config
-  (setq! gptel-api-key (getenv "OPEN_API_KEY")))
+
+  (setq! gptel-temperature 0))
 
 (add-hook! (clojure-mode emacs-lisp-mode lisp-mode
                          cider-repl-mode racket-mode racket-repl-mode)
   (enable-paredit-mode))
 
-
+(setq +format-on-save-disabled-modes
+      '(clojure-mode
+        clojurescript-mode
+        ))
 ;; Reuse buffers for Dired, dont like when it creates a separate one each time.
 (after! dired
   (setf dired-kill-when-opening-new-dired-buffer t))
 
 ;; Cider PopUp goes to right, instead of bottom.
-(after! cider
-  (set-popup-rules!
-    '(("^\\*cider-repl"
-       :side right
-       :width 100
-       :quit nil
-       :ttl nil))))
+
+;; (after! cider
+;;   (set-popup-rules!
+;;     '(("^\\*cider-repl"
+;;        :side right
+;;        :width 100
+;;        :quit nil
+;;        :ttl nil))))
 
 (after! cider
   ;; work around logging issues, figwheel-main vs cider ... fight!
   ;; FORTUM from magnusn
   (defun cider-figwheel-workaround--boot-up-cljs ()
     (format "(boot-up-cljs %s)" cider-figwheel-main-default-options))
-
+  (map! "C-c l l" 'cider-repl-clear-buffer)
+  (map! "C-c c f" 'cider-format-defun)
   (cider-register-cljs-repl-type 'boot-up-cljs #'cider-figwheel-workaround--boot-up-cljs))
