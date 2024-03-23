@@ -11,6 +11,11 @@
 (cond (IS-MAC
        (setq mac-command-modifier       'meta
              mac-option-modifier        'alt
+             mac-right-option-modifier  'alt))
+      (IS-WINDOWS
+       (setq w32-pass-rwindow-to-system nil
+             w32-rwindow-modifier       'meta ; Right Windows key
+             mac-option-modifier        'alt
              mac-right-option-modifier  'alt)))
 (setq confirm-kill-emacs nil)
 (add-to-list 'initial-frame-alist '(fullscreen . maximized))
