@@ -10,8 +10,9 @@
       user-mail-address "karol.adamiec@icloud.com")
 (cond (IS-MAC
        (setq mac-command-modifier       'meta
-             mac-option-modifier        'alt
-             mac-right-option-modifier  'alt))
+             mac-option-modifier        'super
+                                        ; mac-function-modifier      'hyper
+             mac-right-option-modifier  'super))
       (IS-WINDOWS
        (setq w32-pass-rwindow-to-system nil
              w32-rwindow-modifier       'meta ; Right Windows key
@@ -29,7 +30,7 @@
 ;;
 ;; They all accept either a font-spec, font string ("Input Mono-12"), or xlfd
 ;; font string. You generally only need these two:
-(setq doom-font (font-spec :family "Iosevka SS04" :size 20 :weight 'semi-light)
+(setq doom-font (font-spec :family "Iosevka SS04" :size 18 :weight 'semi-light)
       doom-variable-pitch-font (font-spec :family "Iosevka Aile" :size 15))
 
 ;; There are two ways to load a theme. Both assume the theme is installed and
@@ -96,10 +97,25 @@
                          cider-repl-mode racket-mode racket-repl-mode)
   (enable-paredit-mode))
 
+
+;;see https://github.com/doomemacs/doomemacs/issues/7599#issuecomment-1884831702
+(setq-hook! 'clojure-mode-hook apheleia-inhibit t)
+(setq-hook! 'clojurescript-mode-hook apheleia-inhibit t)
+
+
+(use-package! gif-screencast)
+
+(use-package! apheleia) ;; Load formatting lib immediatelly, so the above disabled modes are procesed corectly. does not work really...
 (setq +format-on-save-disabled-modes
       '(clojure-mode
-        clojurescript-mode
-        ))
+        clojurescript-mode))
+
+
+(map! "C-c t t" 'google-translate-smooth-translate)
+(setq google-translate-translation-directions-alist
+      '(("no" . "en") ("en" . "no") ("en" . "fi") ("fi" . "swe")))
+(setq google-translate-output-destination 'kill-ring)
+
 ;; Reuse buffers for Dired, dont like when it creates a separate one each time.
 (after! dired
   (setf dired-kill-when-opening-new-dired-buffer t))
@@ -113,12 +129,26 @@
 ;;        :width 100
 ;;        :quit nil
 ;;        :ttl nil))))
+(after! clj-refactor
+  (setq cljr-favor-prefix-notation nil)
+  (setq cljr-favor-private-functions nil)
+  (setq cljr-insert-newline-after-require nil)
+  (setq cljr-assume-language-context "clj")
+
+  (cljr-add-keybindings-with-modifier "C-M-S-s-")
+  )
+
+(after! lsp-mode
+  (setq lsp-keymap-prefix "s-l")
+  )
+
 
 (after! cider
   ;; work around logging issues, figwheel-main vs cider ... fight!
-  ;; FORTUM from magnusn
+  ;; FORTUM from magnars
   (defun cider-figwheel-workaround--boot-up-cljs ()
     (format "(boot-up-cljs %s)" cider-figwheel-main-default-options))
   (map! "C-c l l" 'cider-repl-clear-buffer)
   (map! "C-c c f" 'cider-format-defun)
+  (clj-refactor-mode t)
   (cider-register-cljs-repl-type 'boot-up-cljs #'cider-figwheel-workaround--boot-up-cljs))

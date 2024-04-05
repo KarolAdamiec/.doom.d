@@ -26,6 +26,8 @@
 (package! keycast :pin "c47fa154c756abd044da4a1353c30b978782f7dc")      ;shows commands in modeline AKA "wtf did i just do?"
 (package! beacon)       ;beacon of light when needed, to show where the point is and active window.
 (package! gptel)
+(package! google-translate)
+(package! gif-screencast)
 
 
 ;; If you'd like to disable a package included with Doom, you can do so here
