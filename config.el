@@ -150,10 +150,14 @@
   (cljr-add-keybindings-with-modifier "C-M-S-s-")
   )
 
+;; LSP package name is called lsp-mode.
 (after! lsp-mode
-  (setq lsp-keymap-prefix "s-l")
+  (setq lsp-keymap-prefix "C-M-s-l")
   )
 
+
+(after! projectile
+  (define-key projectile-mode-map (kbd "s-,") 'projectile-command-map))
 
 (after! cider
   ;; work around logging issues, figwheel-main vs cider ... fight!
