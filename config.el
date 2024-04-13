@@ -164,7 +164,8 @@
   ;; FORTUM from magnars
   (defun cider-figwheel-workaround--boot-up-cljs ()
     (format "(boot-up-cljs %s)" cider-figwheel-main-default-options))
+
+  (cider-register-cljs-repl-type 'boot-up-cljs #'cider-figwheel-workaround--boot-up-cljs)
+
   (map! "C-c l l" 'cider-repl-clear-buffer)
-  (map! "C-c c f" 'cider-format-defun)
-  (clj-refactor-mode t)
-  (cider-register-cljs-repl-type 'boot-up-cljs #'cider-figwheel-workaround--boot-up-cljs))
+  (map! "C-c c f" 'cider-format-defun))
