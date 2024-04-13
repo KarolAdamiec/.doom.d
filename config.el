@@ -68,6 +68,12 @@
 (map! "C-x k" 'kill-current-buffer)
 
 (map! "M-o" 'ace-window)
+
+;;Yegge tip:
+;;Use back kill word more often
+(map! "C-w" 'backward-kill-word)
+(map! "C-x C-w" 'kill-region)
+
 ;;Set modified buffer to orange, default red is too much...
 (custom-set-faces!
   '(doom-modeline-buffer-modified :foreground "orange"))
