@@ -92,13 +92,18 @@
 
 ;;show counter when searching
 (setq isearch-lazy-count t)
+
 ;;treat space in isearch as non greedy any content
 ;;(setq search-whitespace-regexp ".*?")
+
 (use-package! gptel
+  :defer t
   :config
 
   (setq! gptel-temperature 0))
 
+
+;;check if this is still needed
 (add-hook! (clojure-mode emacs-lisp-mode lisp-mode
                          cider-repl-mode racket-mode racket-repl-mode)
   (enable-paredit-mode))
@@ -109,7 +114,8 @@
 (setq-hook! 'clojurescript-mode-hook apheleia-inhibit t)
 
 
-(use-package! gif-screencast)
+(use-package! gif-screencast
+  :defer t)
 
 (use-package! apheleia) ;; Load formatting lib immediatelly, so the above disabled modes are procesed corectly. does not work really...
 (setq +format-on-save-disabled-modes
