@@ -10,7 +10,7 @@
       user-mail-address "karol.adamiec@icloud.com")
 (cond (IS-MAC
        (setq mac-command-modifier       'meta
-             mac-option-modifier        'super
+             mac-option-modifier        'nil
                                         ; mac-function-modifier      'hyper
              mac-right-option-modifier  'super))
       (IS-WINDOWS
@@ -19,7 +19,7 @@
              mac-option-modifier        'alt
              mac-right-option-modifier  'alt)))
 (setq confirm-kill-emacs nil)
-(add-to-list 'initial-frame-alist '(fullscreen . maximized))
+
 ;; Doom exposes five (optional) variables for controlling fonts in Doom. Here
 ;; are the three important ones:
 ;;
@@ -36,7 +36,7 @@
 ;; There are two ways to load a theme. Both assume the theme is installed and
 ;; available. You can either set `doom-theme' or manually load a theme with the
 ;; `load-theme' function. This is the default:
-(setq doom-theme 'doom-one)
+(setq doom-theme 'modus-vivendi)
 
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
@@ -65,28 +65,48 @@
 ;; they are implemented.
 
 ;;STOP ASKING!
-(map! "C-x k" 'kill-current-buffer)
+(map! "C-x k" #'kill-current-buffer)
 
-(map! "M-o" 'ace-window)
+(map! "M-o" #'ace-window)
+(map! "M-g M-g" #'avy-goto-char)
+(map! "M-g g" #'avy-goto-line)
+
 
 ;;Yegge tip:
 ;;Use back kill word more often
-(map! "C-w" 'backward-kill-word)
-(map! "C-x C-w" 'kill-region)
+(map! "C-w" #'backward-kill-word)
+(map! "C-x C-w" #'kill-region)
 
 ;;Set modified buffer to orange, default red is too much...
 (custom-set-faces!
   '(doom-modeline-buffer-modified :foreground "orange"))
 
 
-(use-package! keycast
-  :after (doom-modeline)
-  :config
-  (setq keycast-mode-line-insert-after '(:eval (doom-modeline-format--main)))
+
+(defmacro comment (&rest a))
+(comment)  (use-package! keycast
+             :after (doom-modeline)
+             :config
+             (setq keycast-mode-line-insert-after '(:eval (doom-modeline-format--main)))
                                         ;(setq keycast-mode-line-insert-after "%e")
-  (add-to-list 'global-mode-string '("" keycast-mode-line))
+             (add-to-list 'global-mode-string '("" keycast-mode-line))
+             :hook
+             (doom-modeline-mode . keycast-mode-line-mode))
+
+(use-package! mise
   :hook
-  (doom-modeline-mode . keycast-mode-line-mode))
+  (after-init-hook . global-mise-mode))
+
+(use-package! difftastic
+  :after magit
+  :bind (:map magit-blame-read-only-mode-map
+              ("D" . difftastic-magit-show)
+              ("S" . difftastic-magit-show))
+  :config
+  (eval-after-load 'magit-diff
+    '(transient-append-suffix 'magit-diff '(-1 -1)
+       [("D" "Difftastic diff (dwim)" difftastic-magit-diff)
+        ("S" "Difftastic show" difftastic-magit-show)])))
 
 (beacon-mode t)
 
@@ -122,15 +142,51 @@
       '(clojure-mode
         clojurescript-mode))
 
+"hello world"
+(map! "C-c t t" #'google-translate-smooth-translate)
 
-(map! "C-c t t" 'google-translate-smooth-translate)
 (setq google-translate-translation-directions-alist
-      '(("no" . "en") ("en" . "no") ("en" . "fi") ("fi" . "swe")))
+      '(("no" . "en") ("en" . "no") ("en" . "sv") ("en" . "fi") ))
 (setq google-translate-output-destination 'kill-ring)
 
 ;; Reuse buffers for Dired, dont like when it creates a separate one each time.
 (after! dired
   (setf dired-kill-when-opening-new-dired-buffer t))
+
+
+
+(after! emacs-everywhere
+  ;; Easier to match with a bspwm rule:
+  ;;   bspc rule -a 'Emacs:emacs-everywhere' state=floating sticky=on
+  (setq emacs-everywhere-frame-name-format "emacs-anywhere")
+
+  ;; The modeline is not useful to me in the popup window. It looks much nicer
+  ;; to hide it.
+  (remove-hook 'emacs-everywhere-init-hooks #'hide-mode-line-mode)
+
+  ;; Semi-center it over the target window, rather than at the cursor position
+  ;; (which could be anywhere).
+  (defadvice! center-emacs-everywhere-in-origin-window (frame window-info)
+    :override #'emacs-everywhere-set-frame-position
+    (cl-destructuring-bind (x y width height)
+        (emacs-everywhere-window-geometry window-info)
+      (set-frame-position frame
+                          (+ x (/ width 2) (- (/ width 2)))
+                          (+ y (/ height 2))))))
+
+
+
+
+;;(custom-set-faces! '(default :background "#000000"))
+
+
+;;(custom-set-faces! '(echo-area :background "#000000"))
+
+;; (setq emacs-everywhere-frame-parameters
+;;       `((name . "emacs-everywhere")
+;;         (fullscreen . nil)              ; Helps on GNOME at least
+;;         (width . 100)
+;;         (height . 30)))
 
 ;; Cider PopUp goes to right, instead of bottom.
 
@@ -165,7 +221,17 @@
   (defun cider-figwheel-workaround--boot-up-cljs ()
     (format "(boot-up-cljs %s)" cider-figwheel-main-default-options))
 
-  (cider-register-cljs-repl-type 'boot-up-cljs #'cider-figwheel-workaround--boot-up-cljs)
+  (cider-register-cljs-repl-type 'boot-up-cljs #'cider-figwheel-workaround--boot-up-cljs))
 
-  (map! "C-c l l" 'cider-repl-clear-buffer)
-  (map! "C-c c f" 'cider-format-defun))
+(map! :after cider
+      :map cider-mode-map
+      :prefix "C-c"
+      "l l" 'cider-repl-clear-buffer
+      "c f" 'cider-format-defun)
+;;;;;;;;;;;;;
+;;;;;;;;;;;;;TODO: Move this gold to separate file and clean up
+(load! "functions")
+
+                                        ;(add-to-list 'initial-frame-alist '(fullscreen . maximized))
+(set-frame-parameter nil 'undecorated nil)
+(set-frame-parameter nil 'fullScreen 'maximized)
