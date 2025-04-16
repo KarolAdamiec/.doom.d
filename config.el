@@ -142,7 +142,7 @@
       '(clojure-mode
         clojurescript-mode))
 
-"hello world"
+
 (map! "C-c t t" #'google-translate-smooth-translate)
 
 (setq google-translate-translation-directions-alist
@@ -155,24 +155,25 @@
 
 
 
-(after! emacs-everywhere
-  ;; Easier to match with a bspwm rule:
-  ;;   bspc rule -a 'Emacs:emacs-everywhere' state=floating sticky=on
-  (setq emacs-everywhere-frame-name-format "emacs-anywhere")
+(comment
+ (after! emacs-everywhere
+   ;; Easier to match with a bspwm rule:
+   ;;   bspc rule -a 'Emacs:emacs-everywhere' state=floating sticky=on
+   (setq emacs-everywhere-frame-name-format "emacs-anywhere")
 
-  ;; The modeline is not useful to me in the popup window. It looks much nicer
-  ;; to hide it.
-  (remove-hook 'emacs-everywhere-init-hooks #'hide-mode-line-mode)
+   ;; The modeline is not useful to me in the popup window. It looks much nicer
+   ;; to hide it.
+   (remove-hook 'emacs-everywhere-init-hooks #'hide-mode-line-mode)
 
-  ;; Semi-center it over the target window, rather than at the cursor position
-  ;; (which could be anywhere).
-  (defadvice! center-emacs-everywhere-in-origin-window (frame window-info)
-    :override #'emacs-everywhere-set-frame-position
-    (cl-destructuring-bind (x y width height)
-        (emacs-everywhere-window-geometry window-info)
-      (set-frame-position frame
-                          (+ x (/ width 2) (- (/ width 2)))
-                          (+ y (/ height 2))))))
+   ;; Semi-center it over the target window, rather than at the cursor position
+   ;; (which could be anywhere).
+   (defadvice! center-emacs-everywhere-in-origin-window (frame window-info)
+     :override #'emacs-everywhere-set-frame-position
+     (cl-destructuring-bind (x y width height)
+         (emacs-everywhere-window-geometry window-info)
+       (set-frame-position frame
+                           (+ x (/ width 2) (- (/ width 2)))
+                           (+ y (/ height 2)))))))
 
 
 
@@ -232,6 +233,8 @@
 ;;;;;;;;;;;;;TODO: Move this gold to separate file and clean up
 (load! "functions")
 
-                                        ;(add-to-list 'initial-frame-alist '(fullscreen . maximized))
+(add-to-list 'auto-mode-alist '("\\.repl\\'" . clojure-mode))
+
+(add-to-list 'initial-frame-alist '(fullscreen . maximized))
 (set-frame-parameter nil 'undecorated nil)
 (set-frame-parameter nil 'fullScreen 'maximized)
